@@ -1,17 +1,15 @@
 package org.firstinspires.ftc.teamcode.util.mechanisms
 
 import com.acmerobotics.dashboard.config.Config
-import com.pedropathing.ivy.commands.Commands.infinite
 import dev.nextftc.control.feedback.PIDCoefficients
 import dev.nextftc.control.feedback.PIDController
 import dev.nextftc.control.feedforward.SimpleFFCoefficients
 import dev.nextftc.control.feedforward.SimpleFeedforward
-import dev.nextftc.robot.Mechanism
-import dev.nextftc.robot.Telemetry
+import org.firstinspires.ftc.teamcode.util.Context
 import org.firstinspires.ftc.teamcode.util.Hardware
 
 @Config
-class Shooter : Mechanism {
+class Shooter(private val context: Context) {
     private val shooter = Hardware.motor("shooter")
 
     private val feedbackCoefficients = PIDCoefficients(kp)
@@ -26,18 +24,19 @@ class Shooter : Mechanism {
         @JvmField var targetVelocity = 0.0
     }
 
-    override fun periodic() {
-        val currentVelocity = shooter.encoderVelocity
+    fun periodic() {
+        val currentVelocity = shooter.velocity
 
         feedbackCoefficients.kP = kp
         feedforwardCoefficients.kS = ks
         feedforwardCoefficients.kV = kv
 
-        Telemetry.log("Shooter Velocity", currentVelocity)
-        Telemetry.log("Shooter Target", targetVelocity)
+        context.telemetry.addData("Shooter Velocity", currentVelocity)
+        context.telemetry.addData("Shooter Target", targetVelocity)
 
-        val pid = feedback.calculate(error = targetVelocity - currentVelocity.magnitude)
+        val pid = feedback.calculate(error = targetVelocity - currentVelocity)
         val ff = feedforward.calculate(targetVelocity)
-        shooter.throttle = pid + ff
+
+        shooter.power = pid + ff
     }
 }

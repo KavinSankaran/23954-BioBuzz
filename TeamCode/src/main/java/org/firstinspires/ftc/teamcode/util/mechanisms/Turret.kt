@@ -4,14 +4,13 @@ import com.acmerobotics.dashboard.config.Config
 import dev.nextftc.control.feedback.PIDCoefficients
 import dev.nextftc.control.feedback.PIDController
 import dev.nextftc.hardware.sensors.NextAnalogInput
-import dev.nextftc.robot.Mechanism
-import dev.nextftc.robot.Telemetry
 import dev.nextftc.units.degrees
 import dev.nextftc.units.measuretypes.Angle
+import org.firstinspires.ftc.teamcode.util.Context
 import org.firstinspires.ftc.teamcode.util.Hardware
 
 @Config
-class Turret : Mechanism{
+class Turret(private val context: Context) {
     private val analogInput = NextAnalogInput("analogInput")
     private val servo1 = Hardware.feedbackServo("servo1", analogInput)
     private val servo2 = Hardware.feedbackServo("servo2", analogInput)
@@ -37,7 +36,7 @@ class Turret : Mechanism{
         targetAngle = angle.magnitude.coerceIn(minAngle..maxAngle).degrees
     }
 
-    override fun periodic() {
+    fun periodic() {
         val voltage = analogInput.rawVoltage
         val rawAngle = ((voltage / 3.3) * 360).magnitude
         currentAngle = (rawAngle - 180 + angleOffset).degrees
@@ -50,8 +49,8 @@ class Turret : Mechanism{
         servo1.power = pid
         servo2.power = pid
 
-        Telemetry.log("Turret Voltage", voltage)
-        Telemetry.log("Current Angle", currentAngle)
-        Telemetry.log("Target Angle", targetAngle)
+        context.telemetry.addData("Turret Voltage", voltage)
+        context.telemetry.addData("Current Angle", currentAngle)
+        context.telemetry.addData("Target Angle", targetAngle)
     }
 }

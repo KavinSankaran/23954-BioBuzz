@@ -1,18 +1,26 @@
 package org.firstinspires.ftc.teamcode.opModes.teleop.tests
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode
+import com.acmerobotics.dashboard.config.Config
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import org.firstinspires.ftc.teamcode.util.TuningOpMode
 import org.firstinspires.ftc.teamcode.util.mechanisms.Hood
 import org.firstinspires.ftc.teamcode.util.mechanisms.Shooter
 
+@Config
 @TeleOp(name = "ShooterTuning", group = "tuning")
-class ShooterTuning : OpMode() {
-    private val shooter = Shooter()
-    private val hood = Hood()
+class ShooterTuning : TuningOpMode() {
+    lateinit var shooter: Shooter
+    lateinit var hood: Hood
 
-    override fun init() {}
+    override fun init() {
+        super.init()
+
+        shooter = Shooter(context)
+        hood = Hood(context)
+    }
 
     override fun loop() {
+        super.loop()
         shooter.periodic()
         hood.periodic()
     }
